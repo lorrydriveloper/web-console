@@ -411,6 +411,7 @@ REPLConsole.prototype.install = function(container) {
 
   // Make the console resizable.
   function resizeContainer(ev) {
+    removeClass(container, 'console-minimized');
     var startY              = ev.clientY;
     var startHeight         = parseInt(document.defaultView.getComputedStyle(container).height, 10);
     var scrollTopStart      = consoleOuter.scrollTop;
@@ -461,6 +462,18 @@ REPLConsole.prototype.install = function(container) {
     }
   });
 
+  function minimizeContainer(ev) {
+    if (hasClass(container, 'console-minimized')) {
+      removeClass(container, 'console-minimized');
+      container.style.removeProperty('height');
+      _this.configStorage.updateConfig('minimized', false);
+    } else {
+      addClass(container, 'console-minimized');
+      container.style.height = '20px';
+      _this.configStorage.updateConfig('minimized', true);
+    }
+  }
+
   // Initialize
   this.container = container;
   this.outer = consoleOuter;
@@ -469,12 +482,22 @@ REPLConsole.prototype.install = function(container) {
   this.suggestWait = 1500;
   this.newPromptBox();
   this.insertCss();
+  this.minimizeConsole();
 
   findChild(container, 'resizer').addEventListener('mousedown', resizeContainer);
+  findChild(consoleActions, 'config-button').addEventListener('click', openConfig);
+  findChild(consoleActions, 'minimize-button').addEventListener('click', minimizeContainer);
   findChild(consoleActions, 'close-button').addEventListener('click', closeContainer);
   observer.observe(consoleOuter, { childList: true, subtree: true });
 
   REPLConsole.currentSession = this;
+};
+
+REPLConsole.prototype.minimizeConsole = function() {
+  if (this.configStorage.getConfig('minimized')) {
+    addClass(this.container, 'console-minimized');
+    this.container.style.height = '20px';
+  }
 };
 
 // Add CSS styles dynamically. This probably doesnt work for IE <8.
