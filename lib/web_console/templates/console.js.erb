@@ -44,6 +44,34 @@ function CommandStorage() {
   }
 }
 
+function ConfigStorage(config) {
+  this.config = {
+      ...config,
+      promptLabel: '>> ',
+      clearCommand: 'clear',
+      fontSize: '14px',
+      fontFamily: 'monospace',
+      minimized: false,
+  };
+  let hasLocalStorage = typeof window.localStorage !== 'undefined';
+  let STORAGE_KEY = "web_console_config";
+  if (hasLocalStorage) {
+    const storeConfig = JSON.parse(localStorage.getItem(STORAGE_KEY))|| {};
+    this.config = { ...this.config, ...storeConfig, sessionId: config.sessionId};
+  }
+  
+  this.updateConfig = function(key, value) {
+    this.config[key] = value;
+    if (hasLocalStorage) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({...this.config}));
+    }
+  }
+
+  this.getConfig = function(key, defaultValue) {
+    return this.config[key] || defaultValue;
+  }
+}
+
 function Autocomplete(_words, prefix) {
   this.words = prepareWords(_words);
   this.current = -1;
@@ -262,15 +290,17 @@ var styleElementNonce = '<%= @nonce %>';
 
 // REPLConsole Constructor
 function REPLConsole(config) {
-  function getConfig(key, defaultValue) {
-    return config && config[key] || defaultValue;
-  }
 
   this.commandStorage = new CommandStorage();
-  this.prompt = getConfig('promptLabel', ' >>');
-  this.mountPoint = getConfig('mountPoint');
-  this.sessionId = getConfig('sessionId');
+  this.configStorage = new ConfigStorage(config);
+  this.prompt = this.configStorage.getConfig('promptLabel', '>> ');
+  this.mountPoint = this.configStorage.getConfig('mountPoint');
+  this.sessionId = this.configStorage.getConfig('sessionId');
   this.autocomplete = false;
+}
+
+REPLConsole.prototype.setConfig = function(key, value) {
+  this.configStorage.updateConfig(key, value);
 }
 
 REPLConsole.prototype.getSessionUrl = function(path) {
