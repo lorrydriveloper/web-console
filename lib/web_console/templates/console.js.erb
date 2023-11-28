@@ -323,6 +323,11 @@ REPLConsole.prototype.contextRequest = function(keyword, callback) {
 };
 
 REPLConsole.prototype.commandHandle = function(line, callback) {
+  if (line === this.configStorage.getConfig('clearCommand')) {
+    this.inner.innerHTML = '';
+    this.newPromptBox();
+    return;
+  }
   var self = this;
   var params = 'input=' + encodeURIComponent(line);
   callback = callback || function() {};
