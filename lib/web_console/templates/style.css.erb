@@ -1,33 +1,34 @@
-.console .pos-absolute {
+
+#web-console .pos-absolute {
   position: absolute;
 }
 
-.console .pos-fixed {
+#web-console .pos-fixed {
   position: fixed;
 }
 
-.console .pos-right {
+#web-console .pos-right {
   right: 0;
 }
 
-.console .border-box {
+#web-console .border-box {
   box-sizing: border-box;
 }
 
-.console .layer {
+#web-console .layer {
   width: 100%;
   height: 100%;
 }
 
-.console .layer.console-outer {
+#web-console .layer.console-outer {
   z-index: 1;
 }
 
-.console .layer.resizer {
+#web-console .layer.resizer {
   z-index: 2;
 }
 
-.console {
+#web-console {
   position: fixed;
   left: 0;
   bottom: 0;
@@ -39,12 +40,17 @@
   z-index: 9999;
 }
 
-.console .console-outer {
+
+#web-console.console-minimized .console-outer .console-inner {
+  display: none;
+}
+
+#web-console .console-outer {
   overflow: auto;
   padding-top: 4px;
 }
 
-.console .console-inner {
+#web-console .console-inner {
   font-family: monospace;
   font-size: 11px;
   width: 100%;
@@ -53,11 +59,13 @@
   background: #333;
 }
 
-.console .console-prompt-box {
+
+
+#web-console .console-prompt-box {
   color: #fff;
 }
 
-.console .console-message {
+#web-console .console-message {
   color: #1ad027;
   margin: 0;
   border: 0;
@@ -66,61 +74,60 @@
   padding: 0;
 }
 
-.console .console-message.error-message {
+#web-console .console-message.error-message {
   color: #fc9;
 }
 
-.console .console-message.notification-message {
+#web-console .console-message.notification-message {
   color: #99f;
 }
 
-.console .console-message.auto-complete {
+#web-console .console-message.auto-complete {
   word-break: break-all;
 }
 
-.console .console-message.auto-complete .keyword {
+#web-console .console-message.auto-complete .keyword {
   margin-right: 11px;
 }
 
-.console .console-message.auto-complete .keyword.selected {
+#web-console .console-message.auto-complete .keyword.selected {
   background: #fff;
   color: #000;
 }
 
-.console .console-message.auto-complete .hidden {
+#web-console .console-message.auto-complete .hidden {
   display: none;
 }
 
-.console .console-message.auto-complete .trimmed {
+#web-console .console-message.auto-complete .trimmed {
   display: none;
 }
 
-.console .console-hint {
+#web-console .console-hint {
   color: #096;
 }
 
-.console .console-focus .console-cursor {
+#web-console .console-focus .console-cursor {
   background: #fefefe;
   color: #333;
   font-weight: bold;
 }
 
-.console .resizer {
+#web-console .resizer {
   background: #333;
   width: 100%;
   height: 4px;
   cursor: ns-resize;
 }
 
-.console .console-actions {
+#web-console .console-actions {
+  display: flex;
+  gap: 3px;
   padding-right: 3px;
 }
 
-.console .console-actions .button {
-  float: left;
-}
 
-.console .button {
+#web-console .button {
   cursor: pointer;
   border-radius: 1px;
   font-family: monospace;
@@ -132,16 +139,16 @@
   color: #ccc;
 }
 
-.console .button:hover {
+#web-console .button:hover {
   background: #666;
   color: #fff;
 }
 
-.console .button.close-button:hover {
+#web-console .button.close-button:hover {
   background: #966;
 }
 
-.console .clipboard {
+#web-console .clipboard {
   height: 0px;
   padding: 0px;
   margin: 0px;
@@ -149,7 +156,7 @@
   margin-left: -1000px;
 }
 
-.console .console-prompt-label {
+#web-console .console-prompt-label {
   display: inline;
   color: #fff;
   background: none repeat scroll 0% 0% #333;
@@ -157,7 +164,7 @@
   padding: 0;
 }
 
-.console .console-prompt-display {
+#web-console .console-prompt-display {
   display: inline;
   color: #fff;
   background: none repeat scroll 0% 0% #333;
@@ -165,18 +172,18 @@
   padding: 0;
 }
 
-.console.full-screen {
+#web-console.full-screen {
   height: 100%;
 }
 
-.console.full-screen .console-outer {
+#web-console.full-screen .console-outer {
   padding-top: 3px;
 }
 
-.console.full-screen .resizer {
+#web-console.full-screen .resizer {
   display: none;
 }
 
-.console.full-screen .close-button {
+#web-console.full-screen .close-button {
   display: none;
 }

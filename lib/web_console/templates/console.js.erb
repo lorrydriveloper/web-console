@@ -44,6 +44,34 @@ function CommandStorage() {
   }
 }
 
+function ConfigStorage(config) {
+  this.config = {
+      ...config,
+      promptLabel: '>> ',
+      clearCommand: 'clear',
+      fontSize: '14px',
+      fontFamily: 'monospace',
+      minimized: false,
+  };
+  let hasLocalStorage = typeof window.localStorage !== 'undefined';
+  let STORAGE_KEY = "web_console_config";
+  if (hasLocalStorage) {
+    const storeConfig = JSON.parse(localStorage.getItem(STORAGE_KEY))|| {};
+    this.config = { ...this.config, ...storeConfig, sessionId: config.sessionId};
+  }
+  
+  this.updateConfig = function(key, value) {
+    this.config[key] = value;
+    if (hasLocalStorage) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({...this.config}));
+    }
+  }
+
+  this.getConfig = function(key, defaultValue) {
+    return this.config[key] || defaultValue;
+  }
+}
+
 function Autocomplete(_words, prefix) {
   this.words = prepareWords(_words);
   this.current = -1;
@@ -262,15 +290,17 @@ var styleElementNonce = '<%= @nonce %>';
 
 // REPLConsole Constructor
 function REPLConsole(config) {
-  function getConfig(key, defaultValue) {
-    return config && config[key] || defaultValue;
-  }
 
   this.commandStorage = new CommandStorage();
-  this.prompt = getConfig('promptLabel', ' >>');
-  this.mountPoint = getConfig('mountPoint');
-  this.sessionId = getConfig('sessionId');
+  this.configStorage = new ConfigStorage(config);
+  this.prompt = this.configStorage.getConfig('promptLabel', '>> ');
+  this.mountPoint = this.configStorage.getConfig('mountPoint');
+  this.sessionId = this.configStorage.getConfig('sessionId');
   this.autocomplete = false;
+}
+
+REPLConsole.prototype.setConfig = function(key, value) {
+  this.configStorage.updateConfig(key, value);
 }
 
 REPLConsole.prototype.getSessionUrl = function(path) {
@@ -293,6 +323,11 @@ REPLConsole.prototype.contextRequest = function(keyword, callback) {
 };
 
 REPLConsole.prototype.commandHandle = function(line, callback) {
+  if (line === this.configStorage.getConfig('clearCommand')) {
+    this.inner.innerHTML = '';
+    this.newPromptBox();
+    return;
+  }
   var self = this;
   var params = 'input=' + encodeURIComponent(line);
   callback = callback || function() {};
@@ -376,6 +411,7 @@ REPLConsole.prototype.install = function(container) {
 
   // Make the console resizable.
   function resizeContainer(ev) {
+    removeClass(container, 'console-minimized');
     var startY              = ev.clientY;
     var startHeight         = parseInt(document.defaultView.getComputedStyle(container).height, 10);
     var scrollTopStart      = consoleOuter.scrollTop;
@@ -426,6 +462,18 @@ REPLConsole.prototype.install = function(container) {
     }
   });
 
+  function minimizeContainer(ev) {
+    if (hasClass(container, 'console-minimized')) {
+      removeClass(container, 'console-minimized');
+      container.style.removeProperty('height');
+      _this.configStorage.updateConfig('minimized', false);
+    } else {
+      addClass(container, 'console-minimized');
+      container.style.height = '20px';
+      _this.configStorage.updateConfig('minimized', true);
+    }
+  }
+
   // Initialize
   this.container = container;
   this.outer = consoleOuter;
@@ -434,12 +482,22 @@ REPLConsole.prototype.install = function(container) {
   this.suggestWait = 1500;
   this.newPromptBox();
   this.insertCss();
+  this.minimizeConsole();
 
   findChild(container, 'resizer').addEventListener('mousedown', resizeContainer);
+  findChild(consoleActions, 'config-button').addEventListener('click', openConfig);
+  findChild(consoleActions, 'minimize-button').addEventListener('click', minimizeContainer);
   findChild(consoleActions, 'close-button').addEventListener('click', closeContainer);
   observer.observe(consoleOuter, { childList: true, subtree: true });
 
   REPLConsole.currentSession = this;
+};
+
+REPLConsole.prototype.minimizeConsole = function() {
+  if (this.configStorage.getConfig('minimized')) {
+    addClass(this.container, 'console-minimized');
+    this.container.style.height = '20px';
+  }
 };
 
 // Add CSS styles dynamically. This probably doesnt work for IE <8.
